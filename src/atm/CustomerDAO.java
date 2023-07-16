@@ -9,10 +9,10 @@ public class CustomerDAO {
     Method to authenticate Customer using Acc No. & PIN
     * */
     public static void customerAuthentication(){
-        System.out.println("***In Customer Authentication***");
-        System.out.println("Enter Your Acc No.: ");
+        System.out.println("\n\t***Welcome!***\n");
+        System.out.print("Enter Your Acc No.: ");
         String stringCurrentAccNumber = input.nextLine();
-        System.out.println("Enter Your PIN No.: ");
+        System.out.print("\nEnter Your PIN No.: ");
         String stringCurrentPinNumber = input.nextLine();
         int currentAccNumber = 0;
         try {
@@ -63,6 +63,7 @@ public class CustomerDAO {
     public static void customerLanding(Customer currentCustomer){
         customerLandingWhileLoop:
         while (true){
+            System.out.println("\n***Welcome, "+ currentCustomer.getAccountHolderName()+"!***\n");
             System.out.println("""
                     1. Check Balance
                     2. Withdraw Money
@@ -75,22 +76,23 @@ public class CustomerDAO {
             String choice = input.nextLine();
             switch (choice){
                 case "1":
-                    System.out.println("***In, Check Balance***");
+                    System.out.println("\n\t***Acc Details***\n");
                     showBalance(currentCustomer);
                     break;
                 case "2":
-                    System.out.println("***In, Withdraw Money***");
+                    System.out.println("\n\t***Withdrawal***\n");
                     TransactionDAO.withdrawMoney(currentCustomer);
                     break;
                 case "3":
-                    System.out.println("***In, Transfer Money***");
+                    System.out.println("\n\t***Money Transfer***\t");
                     TransactionDAO.transferMoney(currentCustomer);
                     break;
                 case "4":
-                    System.out.println("***In, Check ATM Balance***");
+                    System.out.println("\n\t\t\t\t***ATM Balance***\n");
                     checkAtmBalance();
+                    break;
                 case "5":
-                    System.out.println("***In, Mini Statement***");
+                    System.out.println("\n\t\t\t\t\t\t\t\t\t***Mini Statement***\n");
                     showMiniStatement(currentCustomer);
                     break;
                 case "6":

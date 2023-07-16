@@ -55,17 +55,17 @@ public class TransactionDAO {
 
     // validating the ATM PIN with regex and equals
     public static boolean isValidPIN(Customer currentCustomer){
-        System.out.println("Enter Your PIN Number: ");
+        System.out.print("\nEnter Your PIN Number: ");
         String stringCurrentPinNumber = input.nextLine().trim();
 
         if(!stringCurrentPinNumber.matches("\\d{4}")){
-            System.out.println("Sorry, Invalid PIN!");
+            System.out.println("\nSorry, Invalid PIN!");
             pressEnterToContinue();
             return false;
         }
         else {
             if(!currentCustomer.getAccountPin().equals(stringCurrentPinNumber)){
-                System.out.println("Invalid PIN!");
+                System.out.println("\nInvalid PIN!");
                 pressEnterToContinue();
                 return false;
             }
@@ -77,9 +77,10 @@ public class TransactionDAO {
     Method to transfer money to another customer
     * */
     public static void transferMoney(Customer currentCustomer){
-        showBalance(currentCustomer);
 
-        System.out.println("Enter Receiver Acc No.: ");
+        System.out.println("\nAvailable Balance: " + numberFormat.format(currentCustomer.getAccountBalance())+"\n");
+
+        System.out.print("Enter Receiver Acc No.: ");
         String stringCAccNumber = input.nextLine().trim();
 
         int transferAccNumber = 0;
@@ -105,7 +106,7 @@ public class TransactionDAO {
             return;
         }
 
-        System.out.println("Enter Transfer Amount : ");
+        System.out.print("\nEnter Transfer Amount : ");
         String stringTransferAmount = input.nextLine().trim();
         int transferAmount = 0;
 
@@ -113,22 +114,22 @@ public class TransactionDAO {
             transferAmount = Integer.parseInt(stringTransferAmount);
         }
         catch (NumberFormatException numberFormatException){
-            System.out.println("Invalid Acc No.!");
+            System.out.println("\nInvalid Acc No.!");
             pressEnterToContinue();
             return;
         }
         if(transferAccNumber == currentCustomer.getAccountNumber()){
-            System.out.println("You Can't Self Transfer!");
+            System.out.println("\nYou Can't Self Transfer!");
             pressEnterToContinue();
             return;
         }
         if(transferAmount < 1000 || transferAmount > 10_000){
-            System.out.println("Enter Transfer Amount within the Range Rs. 1,000 - 10,000...");
+            System.out.println("\nEnter Transfer Amount within the Range Rs. 1,000 - 10,000...");
             pressEnterToContinue();
             return;
         }
         else if(currentCustomer.getAccountBalance() < transferAmount){
-            System.out.println("Not Enough Amount in Your Account...");
+            System.out.println("\nNot Enough Amount in Your Account...");
             pressEnterToContinue();
             return;
         }
@@ -138,7 +139,7 @@ public class TransactionDAO {
         currentCustomer.setAccountBalance(currentCustomer.getAccountBalance() - transferAmount);
         transferCustomer.setAccountBalance(transferCustomer.getAccountBalance() + transferAmount);
 
-        System.out.println("Transfer was Successful!");
+        System.out.println("\nTransfer was Successful!");
 
         String description1 = "Transfer to "+ transferAccNumber;
         Transaction transaction1 = new Transaction(
@@ -166,7 +167,7 @@ public class TransactionDAO {
         updateUniqueTransactionNumber();
         transactions.add(transaction);
 
-        System.out.println("Current Balance: " + numberFormat.format(currentCustomer.getAccountBalance()));
+        System.out.println("\nCurrent Balance: " + numberFormat.format(currentCustomer.getAccountBalance()));
         pressEnterToContinue();
     }
 
@@ -234,7 +235,7 @@ public class TransactionDAO {
     public static void withdrawMoney(Customer currentCustomer){
         HashMap<Integer, Integer> tempAtmDenominations = new HashMap<>(atmDenominations);
 
-        System.out.println("Enter Withdraw Amount: ");
+        System.out.print("Enter Withdraw Amount: ");
         String stringWithdrawAmount = input.nextLine().trim();
 
         int withdrawAmount = 0;
@@ -245,7 +246,7 @@ public class TransactionDAO {
             copyWithdrawAmount = withdrawAmount;
         }
         catch (NumberFormatException numberFormatException){
-            System.out.println("Invalid Amount!");
+            System.out.println("\nInvalid Amount!");
             pressEnterToContinue();
             return;
         }
@@ -255,17 +256,17 @@ public class TransactionDAO {
         }
 
         if(withdrawAmount < MIN_WITHDRAWAL_LIMIT || withdrawAmount > MAX_WITHDRAWAL_LIMIT){
-            System.out.println("Enter Amount Within the Range  100 - 10,000");
+            System.out.println("\nEnter Amount Within the Range  100 - 10,000");
             pressEnterToContinue();
             return;
         }
         if(withdrawAmount > currentCustomer.getAccountBalance()){
-            System.out.println("Insufficient Balance in Your Account!");
+            System.out.println("\nInsufficient Balance in Your Account!");
             pressEnterToContinue();
             return;
         }
         if(withdrawAmount > calculateTotal(atmDenominations)){
-            System.out.println("Insufficient Balance in ATM!");
+            System.out.println("\nInsufficient Balance in ATM!");
             pressEnterToContinue();
             return;
         }
@@ -273,7 +274,7 @@ public class TransactionDAO {
         HashMap<Integer, Integer> withdrawDenomination = setMinimumDenomination(withdrawAmount);
 
         if(!isRequiredDenominationsPossible(withdrawDenomination)){
-            System.out.println("No, Money (Can't give proper Denominations)");
+            System.out.println("\nNo, Money (Can't give proper Denominations)");
             pressEnterToContinue();
             return;
         }
@@ -282,13 +283,13 @@ public class TransactionDAO {
         copyWithdrawAmount -= calculateTotal(withdrawDenomination);
 
         if(copyWithdrawAmount < 0){
-            System.out.println("No, Money (Can't give proper Denominations by rules)");
+            System.out.println("\nNo, Money (Can't give proper Denominations by rules)");
             pressEnterToContinue();
             return;
         }
         boolean isValidDenominations = fillUpBalanceDenomination(true, withdrawAmount, copyWithdrawAmount, withdrawDenomination, tempAtmDenominations);
         if(!isValidDenominations){
-            System.out.println("Sorry!, Can't give possible denominations...");
+            System.out.println("\nSorry!, Can't give possible denominations...");
             System.out.println(withdrawDenomination);
             pressEnterToContinue();
             return;
@@ -311,7 +312,7 @@ public class TransactionDAO {
         transactions.add(transaction);
 
         showAndCalculateTotalDenomination(withdrawDenomination);
-        System.out.println("Collect Your Cash!");
+        System.out.println("\nCollect Your Cash!");
         pressEnterToContinue();
     }
     /*
@@ -337,11 +338,11 @@ public class TransactionDAO {
         for (Transaction transaction : miniStatement){
             String creditOrDebit = transaction.isCredit() ? "Credit" : "Debit";
             if(count < MAX_TRANSACTION_TO_SHOWN){
-                System.out.printf("| %-15d | %-25s | %-15s | %-15d | %-15s |\n",
+                System.out.printf("| %-15d | %-25s | %-15s | %-15s | %-15s |\n",
                         transaction.getTransactionNumber(),
                         transaction.getDescription(),
                         creditOrDebit,
-                        transaction.getAmount(),
+                        numberFormat.format(transaction.getAmount()),
                         numberFormat.format(transaction.getClosingBalance()));
             }
         }

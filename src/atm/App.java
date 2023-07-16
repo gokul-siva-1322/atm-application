@@ -14,8 +14,17 @@ public class App {
     public static int uniqueTransactionNumber = 1000;
 
     // fields to store file paths
-    public static final String currentDir = System.getProperty("user.dir");
-    public static final String FILES_PATH = currentDir + "\\src\\files\\";
+    public static String currentDir = System.getProperty("user.dir");
+
+    static {
+        File currentDirectory = new File(currentDir);
+        File nextDirectory = new File(currentDir + "\\" + currentDirectory.getName());
+        if(nextDirectory.isDirectory()){
+            currentDir = nextDirectory.getPath();
+        }
+    }
+    public static final String CURRENT_DIR = currentDir;
+    public static final String FILES_PATH = CURRENT_DIR + "\\src\\files\\";
     public static final String CUSTOMERS_DATA_FILE_PATH = FILES_PATH + "atm-customers.txt";
     public static final String ATM_DENOMINATIONS_FILE_PATH = FILES_PATH + "atm-denominations.txt";
     public static final String LAST_TRANSACTION_NUMBER_FILE_PATH = FILES_PATH + "last-transaction-number.txt";
@@ -30,8 +39,6 @@ public class App {
         atmDenominations.put(2000, 0);
         atmDenominations.put(500, 0);
         atmDenominations.put(100, 0);
-        System.out.println("In static block: " + atmDenominations);
-
     }
     public static List<Transaction> transactions = Collections.synchronizedList(new ArrayList<>());
     public static List<Customer> customers = Collections.synchronizedList(new ArrayList<>());
@@ -71,6 +78,7 @@ public class App {
     */
     public static void pressEnterToContinue(){
         System.out.print("""
+                
                 Press Enter To Continue...""");
         input.nextLine();
     }
@@ -118,17 +126,15 @@ public class App {
     Method to Load Previous Denomination count If any
     * */
     public static void loadPreviousDenominationIfAny() throws IOException, ClassNotFoundException {
-        System.out.println("Loading Previous Denominations in the ATM....");
         HashMap<?, ?> tempAtmDenominations = (HashMap<?, ?>) customDeSerialization(ATM_DENOMINATIONS_FILE_PATH);
         if(tempAtmDenominations == null){
-            System.out.println("No Previous Denominations Found!");
+            System.out.println("\nNo Previous Denominations Found!");
             customSerialization(ATM_DENOMINATIONS_FILE_PATH, atmDenominations);
         }
         else {
-            System.out.println("Old Denominations File Found!");
-            System.out.println("Adding Previous Denomination....");
+            System.out.println("\nOld Denominations File Found!");
             atmDenominations.replaceAll((key, value) -> value + (Integer) tempAtmDenominations.get(key));
-            System.out.println("Added Successfully!");
+            System.out.println("\nAdded Successfully!");
         }
 
     }
@@ -139,11 +145,11 @@ public class App {
     public static void checkNeededDirectoriesPresentIfNotCreate(){
         File filesDirectory = new File(FILES_PATH);
         if (!filesDirectory.exists()){
-            System.out.println("Files Dir Created: " + filesDirectory.mkdir());
+            filesDirectory.mkdir();
         }
         File transactionsDirectory = new File(CUSTOMER_MINI_STATEMENTS_FOLDER_PATH);
         if(!transactionsDirectory.exists()){
-            System.out.println("Mini Statements Dir Created: " + transactionsDirectory.mkdir());
+            transactionsDirectory.mkdir();
         }
     }
 
@@ -163,8 +169,7 @@ public class App {
             objectOutputStream.close();
             fileOutputStream.close();
         }
-        catch (IOException exception){
-            System.out.println("Error Occurred, During Serialization: " + exception.getMessage());
+        catch (IOException ignored){
         }
     }
 
@@ -184,8 +189,7 @@ public class App {
             objectInputStream.close();
             fileInputStream.close();
         }
-        catch (IOException | ClassNotFoundException exception){
-            System.out.println("Error Occurred, During Deserialization: " + exception.getMessage());
+        catch (IOException | ClassNotFoundException ignored){
         }
 
         return object;
@@ -203,7 +207,7 @@ public class App {
         HashMap<Integer, Integer> inputDenominations = new HashMap<>();
 
         while (counter < keysLength){
-            System.out.printf("Enter Number of %d: %n", keys.get(counter));
+            System.out.printf("\nEnter Number of %d: ", keys.get(counter));
             int noOfNotes = 0;
             try {
                 String stringNoOfNotes = input.nextLine().trim();
@@ -218,7 +222,7 @@ public class App {
         }
         atmDenominations.replaceAll((key, value) -> value + (Integer) inputDenominations.get(key));
         customSerialization(ATM_DENOMINATIONS_FILE_PATH, atmDenominations);
-        System.out.println("Cash Loaded into ATM...");
+        System.out.println("\nCash Loaded into ATM...");
         checkAtmBalance();
     }
 
@@ -311,6 +315,7 @@ public class App {
         mainWhileLoop:
         while (true){
             System.out.println("""
+                    
                     1. Load Cash to ATM
                     2. Show Customer Details
                     3. Show ATM Operations
@@ -320,19 +325,18 @@ public class App {
             String choice = input.nextLine();
             switch (choice){
                 case "1":
-                    System.out.println("***In, Load Cash to ATM***");
+                    System.out.println("\n***In, Load Cash to ATM***");
                     loadCashTotAtm();
                     break;
                 case "2":
-                    System.out.println("***Show Customer Details***");
+                    System.out.println("\n\t\t***Showing Customer Details***");
                     showCustomerDetails();
                     break;
                 case "3":
-                    System.out.println("***Show ATM Operations***");
                     customerAuthentication();
                     break;
                 case "4":
-                    System.out.println("***Thank You\3***");
+                    System.out.println("\n\t***Thank You\3***");
                     // Breaking the loop using Loop Label
                     break mainWhileLoop;
                 default:
